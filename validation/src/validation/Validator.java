@@ -2,6 +2,9 @@ package validation;
 
 import java.util.ArrayList;
 
+import validation.rules.ExplicitRule;
+import validation.rules.Messages;
+import validation.rules.ParameterizedRule;
 import validation.rules.Rule;
 import validation.rules.RuleException;
 import validation.rules.RuleMessage;
@@ -13,11 +16,12 @@ public class Validator {
 	private boolean stopOnFirstFailure = false;
 	private RuleParser ruleParser;
 	private ArrayList<Rule> failedRules;
-	private RuleMessagesBag messagesBag = new RuleMessagesBag();
+	private RuleMessagesBag messagesBag;
 	
 	public Validator() {
 		ruleParser = new RuleParser();
 		failedRules = new ArrayList<>();
+		messagesBag  = new RuleMessagesBag();
 	}
 	
 	/**
@@ -30,10 +34,22 @@ public class Validator {
 		this.stopOnFirstFailure = stopOnFirstFailure;
 	}
 	
+	/**
+	 * Add rules for the given field to validate the given value.
+	 * @param fieldName
+	 * @param fieldValue
+	 * @param rules
+	 * @throws RuleException
+	 */
 	public void addRules(String fieldName, String fieldValue, String rules) throws RuleException {
 		ruleParser.generateRules(fieldName, fieldValue, rules);
 	}
 	
+	/**
+	 * Determine if all specified rules passes the user inputs
+	 * @return boolean
+	 * @throws RuleException
+	 */
 	public boolean pass() throws RuleException {
 		
 		for (Rule rule : ruleParser.getRulesUnderValidation()) {
@@ -45,24 +61,63 @@ public class Validator {
 				}
 			}
 		}
+		// Retrieving error messages.
 		mergeMessages();
 		
 		return failedRules.size() > 0 ? false : true;
 	}
 	
+	/**
+	 * Here we retrieve error messages from the RuleMessagesBag, and inject them
+	 * to the failed rules objects.
+	 * If there are error messages of particular rules specified by the user,
+	 * then we replace the original messages with the user's.
+	 */
 	private void mergeMessages() {
 
 		if(failedRules.size() > 0) {
 			for (Rule rule : failedRules)
 				if(messagesBag.contains(rule.getFieldName(), rule.getRule()))
 					rule.setMessage(messagesBag.get(rule.getFieldName(), rule.getRule()).getMessage());
+				else if(rule.getMessage() == null || rule.getMessage().isBlank()) {
+					if(rule instanceof ExplicitRule) {
+						String message = Messages.getExplicitRuleMessage(rule.getRule());
+						message = String.format(message, rule.getFieldName());
+						rule.setMessage(message);
+					}else if(rule instanceof ParameterizedRule) {
+						String message = Messages.getParameterizedRuleMessage(rule.getRule());
+						message = String.format(message, getFiledNameAndParametersAsArray((ParameterizedRule)rule));
+						rule.setMessage(message);
+					}
+				}
 		}
 	}
 
+	private Object[] getFiledNameAndParametersAsArray(ParameterizedRule rule) {
+		
+		ArrayList<String> params = new ArrayList<>();
+		params.add(rule.getFieldName());
+		
+		if (Rule.getRulesOfMoreThanTwoParameters().contains(rule.getRule()))
+			params.add(rule.getParameters().toString());
+		else
+			params.addAll(rule.getParameters());
+		
+		return params.toArray();
+	}
+
+	/**
+	 * Retrieve all validation Rules that user have added to the validator.
+	 * @return
+	 */
 	public ArrayList<Rule> getRulesUnderValidation(){
 		return ruleParser.getRulesUnderValidation();
 	}
 	
+	/**
+	 * Retrieve all failed Rules.
+	 * @return
+	 */
 	public ArrayList<Rule> getFailedRules(){
 		return failedRules;
 	}
@@ -88,7 +143,12 @@ public class Validator {
 		return messagesBag;
 	}
 	
+	/**
+	 * We get all error messages for failed rules.
+	 * @return ArrayList<String>
+	 */
 	public ArrayList<String> getErrorMessages() {
+		
 		ArrayList<String> errorMessages = new ArrayList<>();
 		for (Rule rule : getFailedRules()) {
 			errorMessages.add(rule.getMessage());
@@ -96,49 +156,4 @@ public class Validator {
 		
 		return errorMessages;
 	}
-
-	/**
-	 * If the Validator validate all fields and no error messages are generated we
-	 * will return true, otherwise false returns
-	 * 
-	 * @return boolean
-	 */
-//	public boolean passed() {
-//		return errorMessages.size() > 0 ? false : true;
-//	}
-//
-//	private boolean min(String fieldName, String value) {
-//		if (value == null || value == "") {
-//			errorMessages.add(String.format(messages.get("min"), fieldName));
-//			return false;
-//		}
-//
-//		String[] s = value.split(":");
-//		if (s.length < 2) {
-//			errorMessages.add(String.format(messages.get("min"), fieldName));
-//			return false;
-//		}
-//
-//		return true;
-//	}
-
-	/**
-	 * Validate the size of an attribute is between a set of values.
-	 *
-	 * @param string     $attribute
-	 * @param mixed      $value
-	 * @param array<int, int|string> $parameters
-	 * @return bool
-	 */
-//	public boolean validateBetween(String attribute, String value, String[] parameters) {
-//		if (parameters.length < 2) {
-//			return false;
-//		}
-//		return parameters[0].compareTo(value) == -1 && value.compareTo(parameters[1]) == -1;
-//	}
-//
-//	private String[] parseValidationRules(String validationRules) {
-//
-//		return validationRules.split(ruleSeparator);
-//	}
 }

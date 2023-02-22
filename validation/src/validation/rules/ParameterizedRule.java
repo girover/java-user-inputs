@@ -6,13 +6,18 @@ import validation.Str;
 
 public class ParameterizedRule extends Rule {
 
+	/**
+	 * Parameterized rules are rules that have parameters like:
+	 * max:40 min:30       ---> max is a rule. 40 is a parameter.
+	 * digits:10           ---> digits is a rule. 10 is a parameter.
+	 * in:admin,student    ---> in is a rule. admin and student are parameters.
+	 */
 	protected ArrayList<String> parameters = new ArrayList<>();
 	
 	public ParameterizedRule(String rule, String fieldName, String fieldValue, String message) throws RuleException {
 		
 		super("parameterized", rule, fieldName, fieldValue, message);
-		// We split rule to the rule and parameters, and the set the rule name to the
-		// generated rule, and we add parameters to the array
+		// We split rule to the rule and parameters
 		parseRuleAndParameters(rule);
 		
 		setMatcher(parseMatcher(getRule()));
@@ -20,12 +25,17 @@ public class ParameterizedRule extends Rule {
 
 	public ParameterizedRule(String fieldName, String fieldValue, String rule) throws RuleException {
 		this(rule, fieldName, fieldValue, null);
-		
-		String message = Messages.getParameterizedRuleMessage(getRule());
-		message = String.format(message, getFiledNameAndParametersAsArray());
-		setMessage(message);
 	}
 	
+	/**
+	 * Separate rule name from its parameters.
+	 * Here we get two strings.
+	 * Then we need to convert parameters string to an ArrayList
+	 * of parameters.
+	 * 
+	 * @param rule String
+	 * @throws RuleException
+	 */
 	private void parseRuleAndParameters(String rule) throws RuleException {
 		try {
 			String[] ruleAndParams = rule.split(ruleParamsSeparator);
@@ -35,19 +45,6 @@ public class ParameterizedRule extends Rule {
 		} catch (Exception e) {
 			throw new RuleException("Rule " + rule + " is not valid");
 		}
-	}
-	
-	private Object[] getFiledNameAndParametersAsArray() {
-		
-		ArrayList<String> params = new ArrayList<>();
-		params.add(fieldName);
-		
-		if (moreThanTwoParameterRules.contains(getRule()))
-			params.add(getParameters().toString());
-		else
-			params.addAll(getParameters());
-		
-		return params.toArray();
 	}
 
 	public ArrayList<String> getParameters() {
@@ -66,8 +63,11 @@ public class ParameterizedRule extends Rule {
 		parameters.addAll(params);
 	}
 	
-
-	
+	/**
+	 * Make the parameters part as an arrayList
+	 * @param parameters
+	 * @return
+	 */
 	private ArrayList<String> parseParameters(String parameters) {
 		
 		ArrayList<String> params = new ArrayList<>();
@@ -138,18 +138,6 @@ public class ParameterizedRule extends Rule {
 	}
 	
 	private Matcher matchDigits() throws RuleException {
-//		return value->{
-//			try {
-//				int param = Integer.parseInt(getParameters().get(0));
-//				
-//				if(value.length() == param)
-//					return true;
-//				
-//				return false;
-//			} catch (Exception e) {
-//				return false;
-//			}
-//		};
 		return matchLength("==");
 	}
 	

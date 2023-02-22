@@ -51,7 +51,7 @@ public abstract class Rule {
 			"format"
 	));
 	
-	protected static ArrayList<String> oneParameterRules = new ArrayList<>(Arrays.asList(
+	protected static ArrayList<String> rulesOfOneParameter = new ArrayList<>(Arrays.asList(
 			"digits",
 			"max",
 			"min",
@@ -66,11 +66,11 @@ public abstract class Rule {
 			"format"
 	));
 	
-	protected static ArrayList<String> twoParameterRules = new ArrayList<>(Arrays.asList(
+	protected static ArrayList<String> rulesOfTwoParameters = new ArrayList<>(Arrays.asList(
 			"between"
 	));
 	
-	protected static ArrayList<String> moreThanTwoParameterRules = new ArrayList<>(Arrays.asList(
+	protected static ArrayList<String> rulesOfMoreThanTwoParameters = new ArrayList<>(Arrays.asList(
 			"in",
 			"notIn",
 			"mime"
@@ -92,6 +92,18 @@ public abstract class Rule {
 		return validParameterizedRules;
 	}
 	
+	public static ArrayList<String> getRulesOfOneParameter() {
+		return rulesOfOneParameter;
+	}
+	
+	public static ArrayList<String> getRulesOfTwoParameters() {
+		return rulesOfTwoParameters;
+	}
+	
+	public static ArrayList<String> getRulesOfMoreThanTwoParameters() {
+		return rulesOfMoreThanTwoParameters;
+	}
+	
 	/**
 	 * All rule classes must implement this method
 	 * to check if the provided value passes the given rule.
@@ -99,6 +111,7 @@ public abstract class Rule {
 	 */
 //	public abstract void matches() throws RuleException;
 	
+
 	/**
 	 * Set a matcher for this rule
 	 * This matcher is responsible for matching the value for a given rule

@@ -11,15 +11,12 @@ public class ExplicitRule extends Rule {
 	
 	public ExplicitRule(String fieldName, String fieldValue, String rule) throws RuleException {
 		this(rule, fieldName, fieldValue, null);
-		
-		String message = Messages.getExplicitRuleMessage(rule);
-		message = String.format(message, fieldName);
-		setMessage(message);
 	}
 	
 	
 	/**
-	 * Here we generate Lambda function for a rule to match a field value.
+	 * Here we generate Lambda function for a rule to check if the field value
+	 * passes the given rule.
 	 * @param rule
 	 * @return Lambda Function to matches a value for given rule.
 	 * @throws RuleException
