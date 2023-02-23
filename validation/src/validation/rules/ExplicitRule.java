@@ -4,13 +4,15 @@ import validation.Str;
 
 public class ExplicitRule extends Rule {
 
-	public ExplicitRule(String rule, String fieldName, String fieldValue, String message) throws RuleException {
-		super("explcit", rule, fieldName, fieldValue, message);
-		setMatcher(parseMatcher(rule));
-	}
-	
+	/**
+	 * @param fieldName      The field under validation.
+	 * @param fieldValue     The value of the field under validation.
+	 * @param rule           The rule this field must pass.
+	 * @throws RuleException
+	 */
 	public ExplicitRule(String fieldName, String fieldValue, String rule) throws RuleException {
-		this(rule, fieldName, fieldValue, null);
+		super(fieldName, fieldValue, rule, "explicit");
+		setMatcher(parseMatcher(rule));
 	}
 	
 	

@@ -10,6 +10,7 @@ public class Main {
 	private static String userRole = "userr";
 	private static String age = "5";
 	private static String date = "12/11-2023";
+	private static String tall = "12A";
 
 	public static void main(String[] args) {
 
@@ -22,6 +23,7 @@ public class Main {
 			validator.addRules("age", age, "numeric|gte:18|lte:50");
 			validator.addRules("date", date, "date|format:dd/mm/yyyy");
 			validator.addRules("email", email, "notEmpty|email");
+			validator.addRules("tall", tall, "regex:[0-9A-Z]+");
 			
 			validator.addRuleMessage("date", "date", "date skal vaere en valid dato.");
 			validator.addRuleMessage("email", "email", "Fuck you please provide a valid email address.");

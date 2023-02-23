@@ -2,6 +2,7 @@ package validation.rules;
 
 import java.util.ArrayList;
 
+import validation.Regex;
 import validation.Str;
 
 public class ParameterizedRule extends Rule {
@@ -14,17 +15,18 @@ public class ParameterizedRule extends Rule {
 	 */
 	protected ArrayList<String> parameters = new ArrayList<>();
 	
-	public ParameterizedRule(String rule, String fieldName, String fieldValue, String message) throws RuleException {
+	/**
+	 * @param fieldName      The field under validation.
+	 * @param fieldValue     The value of the field under validation.
+	 * @param rule           The rule this field must pass.
+	 * @throws RuleException
+	 */
+	public ParameterizedRule(String fieldName, String fieldValue, String rule) throws RuleException {
+		super(fieldName, fieldValue, rule, "parameterized");
 		
-		super("parameterized", rule, fieldName, fieldValue, message);
-		// We split rule to the rule and parameters
 		parseRuleAndParameters(rule);
 		
 		setMatcher(parseMatcher(getRule()));
-	}
-
-	public ParameterizedRule(String fieldName, String fieldValue, String rule) throws RuleException {
-		this(rule, fieldName, fieldValue, null);
 	}
 	
 	/**
@@ -88,7 +90,7 @@ public class ParameterizedRule extends Rule {
 	protected Matcher parseMatcher(String rule) throws RuleException {
 		switch (rule) {
 		case "digits": {
-			return matchDigits();
+			return matchLength("==");
 		}
 		case "between": {
 			return matchBetween();
@@ -100,45 +102,44 @@ public class ParameterizedRule extends Rule {
 			return matchMin();
 		}
 		case "digits_max": {
-			return matchDigitsMax();
+			return matchLength("<=");
 		}
 		case "digits_min": {
-			return matchDigitsMin();
+			return matchLength(">=");
 		}
 		case "length_max": {
-			return matchDigitsMax();
+			return matchLength("<=");
 		}
 		case "length_min": {
-			return matchDigitsMin();
+			return matchLength(">=");
 		}
 		case "in": {
-			return matchIn();
+			return value -> getParameters().contains(value);
 		}
 		case "notIn": {
-			return matchNotIn();
+			return value -> !getParameters().contains(value);
 		}
 		case "gt": {
-			return matchGT();
+			return matchCompareValue(">");
 		}
 		case "gte": {
-			return matchGTE();
+			return matchCompareValue(">=");
 		}
 		case "lt": {
-			return matchLT();
+			return matchCompareValue("<");
 		}
 		case "lte": {
-			return matchLTE();
+			return matchCompareValue("<=");
 		}
 		case "format": {
-			return matchDateFormat(getParameters().get(0));
+			return value -> Str.isDate(value, getParameters().get(0));
+		}
+		case "regex": {
+			return string -> Regex.matches(string, getParameters().get(0));
 		}
 		default:
 			throw new RuleException("Could not generate rule: " + rule);
 		}
-	}
-	
-	private Matcher matchDigits() throws RuleException {
-		return matchLength("==");
 	}
 	
 	private Matcher matchBetween() throws RuleException {
@@ -156,14 +157,6 @@ public class ParameterizedRule extends Rule {
 				return false;
 			}
 		};
-	}
-	
-	private Matcher matchIn() throws RuleException {
-		return value -> getParameters().contains(value);
-	}
-	
-	private Matcher matchNotIn() throws RuleException {
-		return value -> !getParameters().contains(value);
 	}
 	
 	private Matcher matchMax() throws RuleException {
@@ -184,30 +177,6 @@ public class ParameterizedRule extends Rule {
 			// otherwise Max is a length of the value
 			return value.length() > Integer.parseInt(getParameters().get(0)) ? true : false;
 		};
-	}
-	
-	private Matcher matchDigitsMax() throws RuleException {
-		return matchLength("<=");
-	}
-	
-	private Matcher matchDigitsMin() throws RuleException {
-		return matchLength(">=");
-	}
-	
-	private Matcher matchGT() throws RuleException {
-		return matchCompareValue(">");
-	}
-	
-	private Matcher matchLT() throws RuleException {
-		return matchCompareValue("<");
-	}
-	
-	private Matcher matchGTE() throws RuleException {
-		return matchCompareValue(">=");
-	}
-	
-	private Matcher matchLTE() throws RuleException {
-		return matchCompareValue("<=");
 	}
 	
 	private Matcher matchLength(String operator) throws RuleException {
@@ -244,9 +213,5 @@ public class ParameterizedRule extends Rule {
 			}
 			return false;
 		};
-	}
-	
-	private Matcher matchDateFormat(String format) {
-		return value -> Str.isDate(value, format);
 	}
 }

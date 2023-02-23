@@ -46,14 +46,8 @@ public abstract class Str {
 	 * @return
 	 */
 	public static boolean isEmail(String string) {
-		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
 
-		Pattern pat = Pattern.compile(emailRegex);
-
-		if (pat.matcher(string).matches())
-			return true;
-
-		return false;
+		return Regex.matches(string, "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 	}
 
 	/**
@@ -62,14 +56,8 @@ public abstract class Str {
 	 * @return
 	 */
 	public static boolean isAlpha(String string) {
-		String alphaRegex = "^[\\pL\\pM]+$";
 
-		Pattern pat = Pattern.compile(alphaRegex);
-
-		if (pat.matcher(string).matches())
-			return true;
-
-		return false;
+		return Regex.matches(string, "^[\\pL\\pM]+$");
 	}
 
 	/**
@@ -78,14 +66,8 @@ public abstract class Str {
 	 * @return
 	 */
 	public static boolean isAlphaNumeric(String string) {
-		String alphaNumericRegex = "^[\\pL\\pM\\pN]+$";
 
-		Pattern pat = Pattern.compile(alphaNumericRegex);
-
-		if (pat.matcher(string).matches())
-			return true;
-
-		return false;
+		return Regex.matches(string, "^[\\pL\\pM\\pN]+$");
 	}
 
 	/**
@@ -94,14 +76,8 @@ public abstract class Str {
 	 * @return
 	 */
 	public static boolean isAlphaDash(String string) {
-		String alphaDashRegex = "^[\\pL\\pM\\pN_-]+$";
 
-		Pattern pat = Pattern.compile(alphaDashRegex);
-
-		if (pat.matcher(string).matches())
-			return true;
-
-		return false;
+		return Regex.matches(string, "^[\\pL\\pM\\pN_-]+$");
 	}
 
 	/**
@@ -110,14 +86,8 @@ public abstract class Str {
 	 * @return
 	 */
 	public static boolean isNumeric(String string) {
-		String alphaDashRegex = "^[\\pN]+$";
-
-		Pattern pat = Pattern.compile(alphaDashRegex);
-
-		if (pat.matcher(string).matches())
-			return true;
-
-		return false;
+		
+		return Regex.matches(string, "^[\\pN]+$");
 	}
 	
 	/**

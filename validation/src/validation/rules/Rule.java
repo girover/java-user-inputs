@@ -48,7 +48,8 @@ public abstract class Rule {
 			"lt",
 			"lte",
 			"mime",
-			"format"
+			"format",
+			"regex"
 	));
 	
 	protected static ArrayList<String> rulesOfOneParameter = new ArrayList<>(Arrays.asList(
@@ -63,7 +64,8 @@ public abstract class Rule {
 			"gte",
 			"lt",
 			"lte",
-			"format"
+			"format",
+			"regex"
 	));
 	
 	protected static ArrayList<String> rulesOfTwoParameters = new ArrayList<>(Arrays.asList(
@@ -76,12 +78,11 @@ public abstract class Rule {
 			"mime"
 	));
 	
-	public Rule(String type, String rule, String fieldName, String fieldValue, String message) {
-		this.type = type;
-		this.rule = rule;
+	public Rule(String fieldName, String fieldValue, String rule, String type) {
 		this.fieldName = fieldName;
 		this.fieldValue = fieldValue;
-		this.message = message;
+		this.rule = rule;
+		this.type = type;
 	}
 	
 	public static ArrayList<String> getValidExplicitRules() {
